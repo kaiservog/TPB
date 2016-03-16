@@ -121,9 +121,10 @@ class List(object):
         # last 2 columns for seeders and leechers
         seeders = int(cols[2].text)
         leechers = int(cols[3].text)
+        description = row.findall('.//font')[0]
         t = Torrent(title, url, category, sub_category, magnet_link,
                     torrent_link, comments, has_cover, user_status, created,
-                    size, user, seeders, leechers)
+                    size, user, seeders, leechers, description)
         return t
 
 
@@ -320,7 +321,7 @@ class Torrent(object):
 
     def __init__(self, title, url, category, sub_category, magnet_link,
                  torrent_link, comments, has_cover, user_status, created,
-                 size, user, seeders, leechers):
+                 size, user, seeders, leechers, description):
         self.title = title  # the title of the torrent
         self.url = url  # TPB url for the torrent
         self.id = self.url.path_segments()[1]
@@ -337,7 +338,8 @@ class Torrent(object):
         self.seeders = seeders  # number of seeders
         self.leechers = leechers  # number of leechers
         self._info = None
-        self._files = {}
+        self.description = description
+        #self._files = {}
 
     @property
     def info(self):
@@ -350,10 +352,14 @@ class Torrent(object):
 
     @property
     def files(self):
+        return
         if not self._files:
             path = '/ajax_details_filelist.php?id={id}'.format(id=self.id)
             url = self.url.path(path)
             request = get(str(url), headers={'User-Agent' : "Magic Browser","origin_req_host" : "thepiratebay.se"})
+            if not request.text:
+                return
+
             root = html.fromstring(request.text)
             rows = root.findall('.//tr')
             for row in rows:
