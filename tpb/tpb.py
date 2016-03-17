@@ -91,6 +91,7 @@ class List(object):
         links = cols[1].findall('.//a')  # get 4 a tags from this columns
         title = unicode(links[0].text)
         url = self.url.build().path(links[0].get('href'))
+        url_text = links[0].get('href') 
         magnet_link = links[1].get('href')  # the magnet download link
         try:
             torrent_link = links[2].get('href')  # the torrent download link
@@ -122,7 +123,7 @@ class List(object):
         seeders = int(cols[2].text)
         leechers = int(cols[3].text)
         description = row.findall('.//font')[0]
-        t = Torrent(title, url, category, sub_category, magnet_link,
+        t = Torrent(title, url, url_text, category, sub_category, magnet_link,
                     torrent_link, comments, has_cover, user_status, created,
                     size, user, seeders, leechers, description)
         return t
@@ -319,11 +320,12 @@ class Torrent(object):
     Holder of a single TPB torrent.
     """
 
-    def __init__(self, title, url, category, sub_category, magnet_link,
+    def __init__(self, title, url, url_text, category, sub_category, magnet_link,
                  torrent_link, comments, has_cover, user_status, created,
                  size, user, seeders, leechers, description):
         self.title = title  # the title of the torrent
         self.url = url  # TPB url for the torrent
+        self.url_text = url_text
         self.id = self.url.path_segments()[1]
         self.category = category  # the main category
         self.sub_category = sub_category  # the sub category
